@@ -1,0 +1,70 @@
+--setup
+$ npm i -g @nestjs/cli
+
+--run devmode
+$ npm run start:dev
+
+--create api new 
+1.-- create module => nest generate module "name"
+2.-- create controller => nest generate controller "name"
+ตัวอย่าง
+import { Controller,Get, Param, Query } from '@nestjs/common';
+import  { TestoatService } from "./testoat.service";
+
+@Controller('testoat')
+export class TestoatController {
+    //เรียกservice มาใช้
+    constructor(private TestoatService:TestoatService){}
+    //เรียกทั้งหมด
+    @Get ()
+    GetNameall(@Query('name') username?:string){    
+        if(username){
+            return this.TestoatService.findBycondition((user)=>user.name.includes(username));   
+        }  
+                return this.TestoatService.findAll();   
+    }
+    //เรียกจาก id
+    @Get(':id')
+    GetUserById(@Param('id') id:string){
+    return this.TestoatService.findById(Number(id));
+    }
+
+}
+
+
+3.--create interface 
+ตัวอย่าง
+สร้าง file .ts 
+ export interface ProductDTO{
+    name:string;
+    id:number;
+    price:number;
+}
+
+4.-- create service => nest generate service "name" 
+ตัวอย่าง 
+import { Injectable } from '@nestjs/common';
+import { UserDTO } from 'src/dto/user.dto';
+
+@Injectable()
+export class TestoatService {
+    private User  =
+    [
+         {name:'oat',id:1,price:250},
+         {name:'book',id:2,price:260},
+         {name:'Nnon',id:3,price:270}
+     ];
+      //ค้นหาทั้งหมด   
+ findAll(){
+     return this.User;
+         }
+          //ค้นหาจาก Id 
+ findById(id:number){
+    return this.User.find(p=>p.id == id);
+        }
+
+        
+    findBycondition(predicate:(user:UserDTO)=>boolean){
+        return this.User.filter((p)=>predicate(p));
+    }
+}
